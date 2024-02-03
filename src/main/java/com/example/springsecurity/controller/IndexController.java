@@ -1,11 +1,22 @@
 package com.example.springsecurity.controller;
 
+import com.example.springsecurity.domain.User;
+import com.example.springsecurity.dto.request.UserRequestDto;
+import com.example.springsecurity.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller // view를 리턴한다는 의미의 annotation
+@RequiredArgsConstructor
 public class IndexController {
+
+    private final UserRepository userRepository;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @GetMapping({"", "/"})
     public @ResponseBody String index() {
@@ -28,18 +39,22 @@ public class IndexController {
     }
 
     // 해당 메서드는 SecurityConfig 파일을 하면 동작.
-    @GetMapping("/login") // 로그인
-    public @ResponseBody String login() {
-        return "login";
+    @GetMapping("/loginForm") // 로그인
+    public String loginForm() {
+        return "loginForm";
     }
 
-    @GetMapping("/join")
-    public @ResponseBody String join() {
-        return "join";
+    @GetMapping("/joinForm")
+    public String joinForm() {
+        return "joinForm";
     }
 
-    @GetMapping("/joinProc")
-    public @ResponseBody String joinProc() {
-        return "회원가입 완료";
+    @PostMapping("/join")
+    public String join(UserRequestDto userRequestDto) {
+        System.out.println(userRequestDto);
+        userRequestDto.setPassword(bCryptPasswordEncoder.encode(userRequestDto.getPassword()));
+        User saved = userRepository.save(userRequestDto.toEntity());
+        return "redirect:/loginForm";
     }
+
 }
