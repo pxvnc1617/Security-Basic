@@ -27,7 +27,10 @@ public class SecurityConfig {
                         .requestMatchers("/manager/**").access(new WebExpressionAuthorizationManager("hasRole('ROLE_ADMIN') or hasRole('ROLE_MANAGER')"))
                         .requestMatchers("/admin/**").access(new WebExpressionAuthorizationManager("hasRole('ROLE_MANAGER')"))
                         .anyRequest().permitAll())
-                .formLogin(formLogin -> formLogin.loginPage("/login"));
+                .formLogin(formLogin -> formLogin
+                        .loginPage("/loginForm")
+                        .loginProcessingUrl("/login") // login 주소가 호출되면 security 로그인 진행
+                        .defaultSuccessUrl("/"));
 
         return http.build();
     }
